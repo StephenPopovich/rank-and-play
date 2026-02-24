@@ -2,6 +2,144 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { color-scheme: dark; }
-body { @apply bg-zinc-950 text-zinc-100; }
-a { @apply text-indigo-300 hover:text-indigo-200; }
+:root {
+  --bg-primary: #0a0015;
+  --bg-secondary: #12001f;
+  --purple-dark: #6b21a8;
+  --purple-base: #9333ea;
+  --purple-light: #c084fc;
+  --purple-glow: #d8b4fe;
+  --purple-neon: #e9d5ff;
+  --text-primary: #f3e8ff;
+  --text-secondary: #d1d5db;
+  --text-muted: #a3a3a3;
+  --card-bg: rgba(30, 10, 68, 0.65);
+  --border-purple: rgba(168, 85, 247, 0.35);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  @apply bg-[var(--bg-primary)] text-[var(--text-primary)] min-h-screen font-sans antialiased;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(192, 132, 252, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.07) 0%, transparent 60%),
+    url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&q=80&w=2400');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-blend-mode: overlay;
+}
+
+/* Overlay gradient to make text more readable */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(to bottom right, rgba(10, 0, 21, 0.88), rgba(18, 0, 31, 0.92));
+  z-index: -2;
+  pointer-events: none;
+}
+
+/* Headings with gradient text */
+h1, h2, h3, h4 {
+  @apply font-bold tracking-tight;
+}
+
+h1 {
+  @apply text-5xl md:text-6xl lg:text-7xl;
+  background: linear-gradient(90deg, #c084fc, #d8b4fe, #e9d5ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 25px rgba(192, 132, 252, 0.5);
+}
+
+h2 {
+  @apply text-3xl md:text-4xl;
+  background: linear-gradient(90deg, #a855f7, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Cards / panels */
+.card,
+.game-card,
+.profile-card,
+.review-card {
+  @apply backdrop-blur-xl bg-[var(--card-bg)] border border-[var(--border-purple)] rounded-xl overflow-hidden shadow-2xl;
+  transition: all 0.35s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(168, 85, 247, 0.08) inset;
+}
+
+.card:hover,
+.game-card:hover,
+.profile-card:hover,
+.review-card:hover {
+  @apply border-purple-600/60 scale-[1.02];
+  box-shadow: 0 12px 40px rgba(168, 85, 247, 0.25), 0 0 0 1px rgba(192, 132, 252, 0.15) inset;
+}
+
+/* Light purple buttons → whitish on hover with glow */
+.btn,
+button:not([class*="bg-"]),
+input[type="submit"],
+input[type="button"] {
+  @apply bg-[var(--purple-light)] text-[var(--bg-primary)] font-semibold px-6 py-3 rounded-lg transition-all duration-300 ease-out;
+  box-shadow: 0 4px 15px rgba(192, 132, 252, 0.4);
+  border: none;
+  cursor: pointer;
+}
+
+.btn:hover,
+button:not([class*="bg-"]):hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+  @apply bg-white text-purple-950 scale-105;
+  box-shadow: 0 8px 30px rgba(255, 255, 255, 0.45), 0 0 25px rgba(255, 255, 255, 0.3);
+}
+
+/* Outline / secondary buttons variant if needed */
+.btn-outline {
+  @apply border-2 border-[var(--purple-light)] text-[var(--purple-light)] bg-transparent hover:bg-[var(--purple-light)] hover:text-[var(--bg-primary)];
+}
+
+/* Links */
+a {
+  @apply text-[var(--purple-glow)] hover:text-white transition-colors duration-200;
+}
+
+a:hover {
+  text-shadow: 0 0 12px rgba(233, 213, 255, 0.7);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0015;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(#c084fc, #a855f7);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e9d5ff;
+}
+
+/* Selection highlight */
+::selection {
+  background: #c084fc;
+  color: #0a0015;
+}
