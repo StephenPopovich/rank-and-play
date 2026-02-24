@@ -1,0 +1,238 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  BLOGGER
+  STREAMER
+  MOD
+  ADMIN
+  OWNER
+}
+
+enum PostType {
+  BLOG
+  REVIEW
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name         String?
+  email        String  @unique
+  passwordHash String
+
+  role      Role    @default(USER)
+  bio       String?
+  avatarUrl String?
+
+  favoriteGenres String[] @default([])
+  favoriteGames  String[] @default([])
+  platforms      String[] @default([])
+
+  posts        Post[]
+  comments     Comment[]
+  ratings      GameRating[]
+  forumThreads ForumThread[]
+  forumPosts   ForumPost[]
+
+  sentMessages     DirectMessage[] @relation("SentMessages")
+  receivedMessages DirectMessage[] @relation("ReceivedMessages")
+
+  newsletterSubscriptions NewsletterSubscription[]
+}
+
+model Game {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  rawgId      Int?    @unique
+  slug        String  @unique
+  name        String
+  description String?
+
+  coverUrl String?
+  released DateTime?
+
+  ratings  GameRating[]
+  reviews  Post[]       @relation("GameReviews")
+  tags     GameTag[]
+  comments Comment[]
+}
+
+model GameTag {
+  id     String @id @default(cuid())
+  gameId String
+  tagId  String
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([gameId, tagId])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+
+  posts PostTag[]
+  games GameTag[]
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type      PostType
+  title     String
+  slug      String   @unique
+  excerpt   String?
+  contentMd String
+  coverUrl  String?
+  published Boolean  @default(false)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  gameId String?
+  game   Game?   @relation("GameReviews", fields: [gameId], references: [id], onDelete: SetNull)
+
+  overallScore Float?
+
+  tags     PostTag[]
+  comments Comment[]
+}
+
+model PostTag {
+  id     String @id @default(cuid())
+  postId String
+  tagId  String
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([postId, tagId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  body     String
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  postId String?
+  post   Post?   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  gameId String?
+  game   Game?   @relation(fields: [gameId], references: [id], onDelete: Cascade)
+}
+
+model GameRating {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId String
+  gameId String
+
+  gameplay  Int
+  immersion Int
+  fun       Int
+  story     Int
+  graphics  Int
+  sound     Int
+  replay    Int
+
+  avg Float
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gameId])
+}
+
+model ForumCategory {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  name      String
+  slug      String   @unique
+
+  threads ForumThread[]
+}
+
+model ForumThread {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title String
+  slug  String @unique
+
+  categoryId String
+  category   ForumCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  posts ForumPost[]
+}
+
+model ForumPost {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  body String
+
+  threadId String
+  thread   ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model DirectMessage {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  body String
+
+  senderId String
+  sender   User   @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+
+  receiverId String
+  receiver   User   @relation("ReceivedMessages", fields: [receiverId], references: [id], onDelete: Cascade)
+}
+
+model NewsletterIssue {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  title     String
+  slug      String  @unique
+  summary   String?
+  contentMd String
+  published Boolean @default(false)
+}
+
+model NewsletterSubscription {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
+}
