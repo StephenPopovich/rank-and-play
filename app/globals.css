@@ -27,7 +27,7 @@ html, body {
   height: 100%;
 }
 
-body {
+body {n
   @apply bg-[var(--bg-primary)] text-[var(--text-primary)] min-h-screen font-sans antialiased;
   background-image: 
     radial-gradient(circle at 20% 30%, rgba(192, 132, 252, 0.08) 0%, transparent 50%),
