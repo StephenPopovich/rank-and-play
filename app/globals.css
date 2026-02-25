@@ -39,6 +39,12 @@ body {
   background-blend-mode: overlay;
 }
 
+nav a{
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 800;
+}
+
 /* Overlay gradient to make text more readable */
 body::before {
   content: '';

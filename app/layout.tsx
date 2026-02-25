@@ -1,5 +1,6 @@
 import "./globals.css";
 import Nav from "@/components/Nav";
+import Footer from "@/components/Footer";
 
 export const metadata = {
   title: "RankAndPlay",
@@ -13,6 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* @ts-expect-error Async Server Component */}
         <Nav />
         <main className="mx-auto max-w-6xl p-4">{children}</main>
+        <Footer />
       </body>
     </html>
   );

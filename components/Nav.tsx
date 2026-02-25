@@ -7,7 +7,7 @@ export default async function Nav() {
   return (
     <header className="border-b border-zinc-800 bg-zinc-950/60 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between p-4">
-        <Link href="/" className="text-lg font-semibold text-zinc-100">RankAndPlay</Link>
+        <Link href="/" className="text-lg font-semibold text-zinc-100">Rankandplay.com</Link>
         <nav className="flex items-center gap-4 text-sm">
           <Link href="/games">Games</Link>
           <Link href="/hall-of-fame">Hall of Fame</Link>
