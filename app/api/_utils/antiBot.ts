@@ -1,23 +1,46 @@
-export async function verifyTurnstile(token?: string | null) {
-  // Recommended in production:
-  // - Set TURNSTILE_SECRET_KEY in env
-  // - Send token from client (Turnstile widget)
-  // - Verify here with Cloudflare
-  //
-  // For now we return true so the starter works immediately.
-  // Flip this to enforce once you wire Turnstile.
-  if (!process.env.TURNSTILE_SECRET_KEY) return true;
-  if (!token) return false;
+import { NextRequest } from "next/server";
 
-  const form = new FormData();
-  form.append("secret", process.env.TURNSTILE_SECRET_KEY);
-  form.append("response", token);
+export async function verifyTurnstile(_req: NextRequest) {
+  // Kid version:
+  // If we are building on our computer (localhost), always say YES.
+  // Only check bots on the real website (production).
+  if (process.env.NODE_ENV !== "production") {
+    return { ok: true as const };
+  }
 
-  const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+  const secret = process.env.TURNSTILE_SECRET_KEY || "";
+  if (!secret) {
+    return { ok: false as const, error: "Turnstile is not configured on the server." };
+  }
+
+  const form = await _req.formData();
+  const token = form.get("turnstileToken");
+
+  if (!token || typeof token !== "string") {
+    return { ok: false as const, error: "Bot check required." };
+  }
+
+  const ip =
+    _req.headers.get("cf-connecting-ip") ||
+    _req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    "";
+
+  const body = new URLSearchParams();
+  body.set("secret", secret);
+  body.set("response", token);
+  if (ip) body.set("remoteip", ip);
+
+  const resp = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
     method: "POST",
-    body: form,
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body,
   });
 
-  const json = (await res.json()) as { success: boolean };
-  return Boolean(json.success);
+  const data = (await resp.json().catch(() => null)) as any;
+
+  if (!data?.success) {
+    return { ok: false as const, error: "Bot check failed." };
+  }
+
+  return { ok: true as const };
 }

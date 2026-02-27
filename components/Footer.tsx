@@ -85,7 +85,7 @@ export default function Footer() {
           <div>
             <Link href="/" className="inline-flex items-center gap-2">
               <span className="text-lg font-semibold tracking-tight">
-                RankAndPlay
+                Rank and Play
               </span>
               <span className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-xs text-white/80">
                 showpiece build

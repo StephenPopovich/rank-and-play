@@ -25,6 +25,12 @@ function getFormString(form: FormData, key: string): string | undefined {
   return typeof v === "string" ? v : undefined;
 }
 
+function wantsJson(req: Request) {
+  const accept = req.headers.get("accept") || "";
+  // If the client says it wants JSON, we return JSON (no redirects).
+  return accept.includes("application/json");
+}
+
 export async function POST(req: Request) {
   const ip = req.headers.get("x-forwarded-for") ?? "local";
   const rl = rateLimit(`register:${ip}`, { limit: 10, windowMs: 60_000 });
@@ -50,12 +56,15 @@ export async function POST(req: Request) {
 
   const email = parsed.data.email.toLowerCase();
 
-  const botOk = await verifyTurnstile(parsed.data.turnstileToken);
-  if (!botOk) {
-    return NextResponse.json(
-      { error: "Bot check failed", issues: [{ field: "turnstileToken", message: "Bot check failed" }] },
-      { status: 400 }
-    );
+  // Skip bot check while building locally (anything not production).
+  if (process.env.NODE_ENV === "production") {
+    const botOk = await verifyTurnstile(parsed.data.turnstileToken);
+    if (!botOk) {
+      return NextResponse.json(
+        { error: "Bot check failed", issues: [{ field: "turnstileToken", message: "Bot check failed" }] },
+        { status: 400 }
+      );
+    }
   }
 
   const existing = await prisma.user.findUnique({ where: { email } });
@@ -76,5 +85,12 @@ export async function POST(req: Request) {
     },
   });
 
+  // IMPORTANT CHANGE:
+  // If the signup page called us (fetch), return JSON so it can redirect to success page.
+  if (wantsJson(req)) {
+    return NextResponse.json({ ok: true }, { status: 200 });
+  }
+
+  // Otherwise do the old redirect behavior.
   return NextResponse.redirect(new URL("/auth/signin?created=1", req.url));
 }
