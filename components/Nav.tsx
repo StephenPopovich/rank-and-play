@@ -1,4 +1,3 @@
-// components/Nav.tsx
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -20,6 +19,7 @@ export default async function Nav() {
             <span className="font-semibold text-white">RankAndPlay</span>
           </Link>
 
+          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
             <Link className={navLink} href="/games">
               Games
@@ -38,12 +38,19 @@ export default async function Nav() {
             </Link>
 
             {isAuthed && (
-              <Link className={navLink} href="/profile">
-                Profile
-              </Link>
+              <>
+                <Link className={navLink} href="/write-blog">
+                  Write Blog
+                </Link>
+
+                <Link className={navLink} href="/profile">
+                  Profile
+                </Link>
+              </>
             )}
           </nav>
 
+          {/* Right Side */}
           <div className="flex items-center gap-2">
             {isAuthed ? (
               <>
@@ -69,6 +76,7 @@ export default async function Nav() {
           </div>
         </div>
 
+        {/* Mobile Nav */}
         <nav className="md:hidden pb-3 flex flex-wrap gap-2">
           <Link className={navLink} href="/games">
             Games
@@ -85,10 +93,17 @@ export default async function Nav() {
           <Link className={navLink} href="/reviews">
             Reviews
           </Link>
+
           {isAuthed && (
-            <Link className={navLink} href="/profile">
-              Profile
-            </Link>
+            <>
+              <Link className={navLink} href="/write-blog">
+                Write Blog
+              </Link>
+
+              <Link className={navLink} href="/profile">
+                Profile
+              </Link>
+            </>
           )}
         </nav>
       </div>

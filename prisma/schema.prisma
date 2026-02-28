@@ -236,3 +236,64 @@ model NewsletterSubscription {
 
   @@unique([userId])
 }
+
+model Post {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type      PostType
+  title     String
+  slug      String   @unique
+  excerpt   String?
+  contentMd String
+  coverUrl  String?
+  published Boolean  @default(false)
+
+  // Added for Write Blog
+  seoTitle       String?
+  seoDescription String?
+  allowIndexing  Boolean @default(false)
+  showInBlog     Boolean @default(false)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  gameId String?
+  game   Game?   @relation("GameReviews", fields: [gameId], references: [id], onDelete: SetNull)
+
+  overallScore Float?
+
+  tags     PostTag[]
+  comments Comment[]
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  type      PostType
+  title     String
+  slug      String   @unique
+  excerpt   String?
+  contentMd String
+  coverUrl  String?
+  published Boolean  @default(false)
+
+  seoTitle       String?
+  seoDescription String?
+  allowIndexing  Boolean @default(false)
+  showInBlog     Boolean @default(false)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  gameId String?
+  game   Game?   @relation("GameReviews", fields: [gameId], references: [id], onDelete: SetNull)
+
+  overallScore Float?
+
+  tags     PostTag[]
+  comments Comment[]
+}
